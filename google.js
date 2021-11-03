@@ -142,29 +142,60 @@ module.exports = function(RED) {
                 props.forEach(function(val) {
                     operation = operation[val];
                 });
+				
+				//path by Emilio Sabatucci, 03 Nov 2021: to download a file with google drive is necessary to set the
+				//encoding
+				
+				if(msg.encoding){
+					
+					operation(msg.payload, { encoding: msg.encoding }, function(err, res) {
 
-                operation(msg.payload, function(err, res) {
+	                    if (err) {
+	                        node.status({
+	                            fill: 'red',
+	                            shape: 'dot',
+	                            text: 'error'
+	                        });
+	                        node.error(err);
+	                        return;
+	                    }
+	
+	                    node.status({
+	                        fill: 'yellow',
+	                        shape: 'dot',
+	                        text: 'success'
+	                    });
+	
+	                    msg.payload = res;
+	
+	                    node.send(msg);
+	                });
+					
+				}else{
+					operation(msg.payload, function(err, res) {
 
-                    if (err) {
-                        node.status({
-                            fill: 'red',
-                            shape: 'dot',
-                            text: 'error'
-                        });
-                        node.error(err);
-                        return;
-                    }
-
-                    node.status({
-                        fill: 'yellow',
-                        shape: 'dot',
-                        text: 'success'
-                    });
-
-                    msg.payload = res;
-
-                    node.send(msg);
-                });
+	                    if (err) {
+	                        node.status({
+	                            fill: 'red',
+	                            shape: 'dot',
+	                            text: 'error'
+	                        });
+	                        node.error(err);
+	                        return;
+	                    }
+	
+	                    node.status({
+	                        fill: 'yellow',
+	                        shape: 'dot',
+	                        text: 'success'
+	                    });
+	
+	                    msg.payload = res;
+	
+	                    node.send(msg);
+	                });
+				}
+                
             });
 
         });
